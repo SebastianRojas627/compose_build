@@ -1,0 +1,39 @@
+version: '3'
+services:
+
+  database:
+    image: mysql:debian
+    restart: unless-stopped
+    ports:
+      - 8000:3306
+    environment:
+      - MYSQL_HOST=127.0.0.1
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=laguarderia
+    volumes:
+      - db:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+    networks:
+      - app_network
+
+  client_side:
+    build: ./client_side
+    ports:
+      - 3000:80
+    working_dir: /app
+    networks:
+      - app_network
+
+  server_side:
+    build: ./server
+    ports:
+      - 5000:5000
+    networks:
+      - app_network
+
+volumes:
+  db:
+
+networks:
+  app_network:
